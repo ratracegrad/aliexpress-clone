@@ -1,4 +1,3 @@
-import { pwa } from './config/pwa'
 import { appDescription } from './constants/index'
 
 export default defineNuxtConfig({
@@ -6,9 +5,14 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     '@unocss/nuxt',
     '@pinia/nuxt',
+    '@pinia-plugin-persistedstate/nuxt',
     '@nuxtjs/color-mode',
-    '@vite-pwa/nuxt',
+    '@nuxtjs/supabase',
   ],
+
+  supabase: {
+    redirect: false,
+  },
 
   experimental: {
     // when using generate, payload js assets included in sw precache manifest
@@ -55,8 +59,6 @@ export default defineNuxtConfig({
       ],
     },
   },
-
-  pwa,
 
   devtools: {
     enabled: true,

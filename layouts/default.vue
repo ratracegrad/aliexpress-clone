@@ -1,9 +1,16 @@
+<script setup lang="ts">
+import { useUserStore } from '~/stores/user'
+
+const userStore = useUserStore()
+</script>
+
 <template>
-  <main class="px-10 py-20 text-center">
+  <main class="">
+    <Header />
+
+    <Loading v-if="userStore.isLoading" />
+    <div class="pt-[80px] lg:pt-[150px] md:pt-[130px]" />
     <slot />
-    <Footer />
-    <div class="mx-auto mt-5 text-center text-sm opacity-25">
-      [Default Layout]
-    </div>
+    <Footer v-if="!userStore.isLoading" />
   </main>
 </template>

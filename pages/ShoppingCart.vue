@@ -54,6 +54,15 @@ const products = [
           </div>
         </div>
       </div>
+
+      <div class="my-4 block md-hidden" />
+
+      <div class="md:w-[35%]">
+        <div id="Summary" class="bg-white rounded-lg p-4">
+          <div class="text-2xl font-semibold mb-2">Summary</div>
+        </div>
+      </div>
+      
     </div>
   </div>
 </template>

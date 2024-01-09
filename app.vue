@@ -7,10 +7,11 @@ useHead({
 </script>
 
 <template>
-  <VitePwaManifest />
-  <NuxtLayout>
-    <NuxtPage />
-  </NuxtLayout>
+  <div class="h-full w-full bg-[#FAFAFA]">
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+  </div>
 </template>
 
 <style>
