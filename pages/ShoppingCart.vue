@@ -1,4 +1,16 @@
 <script setup lang="ts">
+import { useUserStore } from '@/stores/user'
+
+interface Product {
+  id: number
+  name: string
+  price: number
+  url: string
+  description: string
+}
+
+const userStore = useUserStore()
+const selectedArray = ref([]) as Ref<Product[]>
 const products = [
   {
     id: 4,
@@ -15,6 +27,53 @@ const products = [
     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla vel urna eget massa mollis aliquam. Donec euismod, nisl eget aliquet ultricies, nunc nisl aliquet nunc, quis ali',
   },
 ]
+const cards = ref([
+  'visa.png',
+  'mastercard.png',
+  'paypal.png',
+  'applepay.png',
+])
+
+onMounted(() => {
+  setTimeout(() => userStore.isLoading = false, 200)
+})
+
+const totalPriceComputed = computed(() => {
+  let total = 0
+  userStore.cart.forEach((item) => {
+    total += item.price
+  })
+  return total / 100
+})
+
+function selectedRadioFunc(e: Product) {
+  if (!selectedArray.value.length) {
+    selectedArray.value.push(e)
+    return
+  }
+
+  selectedArray.value.forEach((item: Product, idx) => {
+    if (item.id !== e.id)
+      selectedArray.value.push(e)
+    else
+      selectedArray.value.splice(idx, 1)
+  })
+}
+
+function goToCheckout() {
+  const ids: number[] = []
+  userStore.checkout = []
+
+  selectedArray.value.forEach(item => ids.push(item.id))
+
+  const res = userStore.cart.filter((item) => {
+    return ids.includes(item.id)
+  })
+
+  res.forEach((item) => userStore.checkout.push(toRaw(item)));
+
+  return navigateTo('/checkout')
+}
 </script>
 
 <template>
@@ -58,11 +117,38 @@ const products = [
       <div class="my-4 block md-hidden" />
 
       <div class="md:w-[35%]">
-        <div id="Summary" class="bg-white rounded-lg p-4">
-          <div class="text-2xl font-semibold mb-2">Summary</div>
+        <div id="Summary" class="rounded-lg bg-white p-4">
+          <div class="mb-2 text-2xl font-semibold">
+            Summary
+          </div>
+          <div class="my-4 flex items-center justify-between">
+            <div class="font-semibold">
+              Total
+            </div>
+            <div class="text-2xl font-semibold">
+              $ <span class="font-extrabold">{{ totalPriceComputed }}</span>
+            </div>
+          </div>
+
+          <button
+            class="mt-4 w-full flex items-center justify-center rounded-full bg-rose-500 p-1.5 text-xl font-semibold"
+            @click="goToCheckout"
+          >
+            Checkout
+          </button>
+        </div>
+
+        <div id="PaymentProtection" class="mt-4 rounded-lg bg-white p-4">
+          <div class="mb-2 text-lg font-semibold">
+            Payment Methods
+          </div>
+          <div class="my-4 flex items-center justify-start gap-8">
+            <div v-for="(card, cardIdx) in cards" :key="cardIdx">
+              <img :src="card" alt="card" class="h-6">
+            </div>
+          </div>
         </div>
       </div>
-      
     </div>
   </div>
 </template>
