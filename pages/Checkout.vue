@@ -71,44 +71,107 @@ async function showError() {}
               <span class="ml-2">Update Address</span>
             </NuxtLink>
 
-            <div class="pt-2 border-t">
-              <div class="underline pb-1">Delivery Address</div>
-              
+            <div class="border-t pt-2">
+              <div class="pb-1 underline">
+                Delivery Address
+              </div>
+
               <ul class="text-xs">
                 <li class="flex items-center gap-2">
                   <div>Contact name:</div>
-                  <div class="font-bold">TEST</div>
+                  <div class="font-bold">
+                    TEST
+                  </div>
                 </li>
                 <li class="flex items-center gap-2">
                   <div>Address:</div>
-                  <div class="font-bold">TEST</div>
+                  <div class="font-bold">
+                    TEST
+                  </div>
                 </li>
                 <li class="flex items-center gap-2">
                   <div>Zip Code:</div>
-                  <div class="font-bold">TEST</div>
+                  <div class="font-bold">
+                    TEST
+                  </div>
                 </li>
                 <li class="flex items-center gap-2">
                   <div>City:</div>
-                  <div class="font-bold">TEST</div>
+                  <div class="font-bold">
+                    TEST
+                  </div>
                 </li>
                 <li class="flex items-center gap-2">
                   <div>Country:</div>
-                  <div class="font-bold">TEST</div>
+                  <div class="font-bold">
+                    TEST
+                  </div>
                 </li>
               </ul>
             </div>
           </div>
 
           <NuxtLink v-else to="/address" class="flex items-center pb-2 text-blue-500 hover:text-red-400">
-              <div class="i-material-symbols-add text-lg" />
-              <span class="ml-2">Add New Address</span>
-            </NuxtLink>
+            <div class="i-material-symbols-add text-lg" />
+            <span class="ml-2">Add New Address</span>
+          </NuxtLink>
         </div>
 
-        <div id="Items" class="bg-white rounded-lg p-4 mt-4">
+        <div id="Items" class="mt-4 rounded-lg bg-white p-4">
           <div v-for="product in products" :key="product.id">
-            <CheckoutItem :="product" />
+            <CheckoutItem :product="product" />
           </div>
+        </div>
+      </div>
+
+      <div class="my-4 block md:hidden" />
+
+      <div class="md-w-[35%]">
+        <div id="PlaceOrder" class="rounded-lg bg-white p-4">
+          <div class="mb-2 text-2xl font-extrabold">
+            Summary
+          </div>
+          <div class="justify-betweeen my-4 flex items-center">
+            <div>TotalS Shipping</div>
+            <div>Free</div>
+          </div>
+
+          <div class="border-t" />
+
+          <div class="my-4 flex items-center justify-between">
+            <div class="font-semibold">
+              Total
+            </div>
+            <div class="text-2xl font-semibold">
+              $ <span class="font-extrabold">{{ total / 100 }}</span>
+            </div>
+          </div>
+
+          <form @submit.prevent="pay()">
+            <div id="card-element" class="border border-gray-500 rounded-sm p-2" />
+            <p id="card-error" class="text-center text-red-700 font-semibold" role="alert" />
+
+            <button
+              :disabled="isProcessing"
+              type="submit"
+              class="mt-4 w-full rounded-full from-orange-500 to-orange-600 bg-gradient-to-r p-1.5 text-xl text-white font-semibold"
+              :class="isProcessing ? 'opacity-70' : 'opacity-100'"
+            >
+              <div v-if="isProcessing" class="i-line-md-loading-loop" />
+              <div v-else>
+                Place Order
+              </div>
+            </button>
+          </form>
+        </div>
+
+        <div class="mt-4 rounded-lg bg-white p-4">
+          <div class="mb-2 mt-2 text-lg font-semibold">
+            AliExpress
+          </div>
+          <p class="my-2">
+            AliExpress keeps your information and payment safe
+          </p>
         </div>
       </div>
     </div>
