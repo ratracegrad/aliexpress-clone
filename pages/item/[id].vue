@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watchEffect } from 'vue'
-import { useRoute } from 'vue-router'
-
 import { useUserStore } from '../../stores/user'
 
 interface Product {
