@@ -14,7 +14,7 @@ export const useUserStore = defineStore('user', {
 interface Product {
   id: number;
   name: string;
+  description: string;
   price: number;
-  image: string;
-  quantity: number;
+  url: string;
 }
