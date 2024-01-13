@@ -4,13 +4,14 @@ import { useUserStore } from '../../stores/user'
 interface Product {
   id: number
   name: string
-  price: number
   description: string
+  price: number
   url: string
 }
 
 const userStore = useUserStore()
 const currentImage = ref('')
+const product = ref({} as any)
 const images = ref([
   '',
   'https://picsum.photos/id/212/800/800',
@@ -21,25 +22,28 @@ const images = ref([
 ])
 const route = useRoute()
 
-onMounted(() => {
-  currentImage.value = 'https://picsum.photos/id/77/800/800'
-  images.value[0] = 'https://picsum.photos/id/77/800/800'
+onBeforeMount(async () => {
+  product.value = await useFetch(`/api/prisma/get-product-by-id/${route.params.id}`)
 })
 
 watchEffect(() => {
-  images.value[0] = 'https://picsum.photos/id/77/800/800'
+  if (product.value && product.value.data) {
+    currentImage.value = product.value.data.url
+    images.value[0] = product.value.data.url
+    userStore.isLoading = false
+  }
 })
 
 const priceComputed = computed(() => {
-  // return product.value.price.toLocaleString('en-US', {
-  // 	style: 'currency',
-  // 	currency: 'USD',
-  // })
-  return '26.40'
+  if (product.value && product.value.data) 
+    return product.value.data.price / 100
+  
+  return '0.00'
 })
+
 const isInCart = computed(() => {
 	let res = false
-	userStore.cart.forEach((prod: Product) => {
+  userStore.cart.forEach((prod: { id: number; name: string; price: number; image: string; quantity: number; }) => {
 		if (Number(route.params.id) === prod.id)
 			res = true
 	})
@@ -47,7 +51,7 @@ const isInCart = computed(() => {
 })
 
 function addToCart() {
-  alert('Added to cart')
+  userStore.cart.push(product.value.data)
 }
 </script>
 
@@ -72,12 +76,12 @@ function addToCart() {
       </div>
 
       <div class="rounded-lg bg-white p-3 md:w-[60%]">
-        <div v-if="true">
+        <div v-if="product && product.data">
           <p class="mb-2">
-            Title
+            {{ product.data.name }}
           </p>
           <p class="mb-2 text-sm font-light">
-            Description Section
+            {{ product.data.description }}
           </p>
         </div>
         <div class="5 flex items-center pt-1">

@@ -16,8 +16,18 @@ const error = ref(null) as Ref<Error | null>
 const isWorking = ref(false)
 const isUpdate = ref(false)
 const currentAddress = ref(null)
+const user = useSupabaseUser()
 
-watchEffect(() => {
+watchEffect(async () => {
+	currentAddress.value = await useFetch(`/api/prisma/get-address-by-user/${user.value.id}`)
+	if (currentAddress.value.data) {
+		contactName.value = currentAddress.value.data.contactName
+		address.value = currentAddress.value.data.address
+		zipCode.value = currentAddress.value.data.zipCode
+		city.value = currentAddress.value.data.city
+		country.value = currentAddress.value.data.country
+		isUpdate.value = true
+	}
 	userStore.isLoading = false
 })
 
@@ -56,6 +66,39 @@ async function submit() {
 		isWorking.value = false
 		return
 	}
+
+	if (isUpdate.value) {
+		await useFetch(`/api/prisma/update-address/${currentAddress.value.data.id}`, {
+			method: 'PATCH',
+			body: {
+				userId: user.value?.id,
+				name: contactName.value,
+				address: address.value,
+				zipCode: zipCode.value,
+				city: city.value,
+				country: country.value,
+			},
+		})
+		isWorking.value = false
+
+		return navigateTo('/checkout')
+	}
+
+	await useFetch('/api/prisma/add-address', {
+		method: 'POST',
+		body: {
+			userId: user.value?.id,
+			name: contactName.value,
+			address: address.value,
+			zipCode: zipCode.value,
+			city: city.value,
+			country: country.value,
+		},
+	})
+
+	isWorking.value = false
+
+	return navigateTo('/checkout')
 
 }
 </script>
