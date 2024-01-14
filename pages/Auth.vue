@@ -11,9 +11,9 @@ watchEffect(() => {
     return navigateTo('/')
 })
 
-async function login(provider: string) {
-	const { data, error } = await client.auth.signInWithOAuth({ 
-		provider 
+async function login(prov: string) {
+	const { error } = await client.auth.signInWithOAuth({ 
+		provider: prov as string,
 	})
 	if (error) console.error(error)
 }
