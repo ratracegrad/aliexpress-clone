@@ -17,6 +17,7 @@
     "@pinia-plugin-persistedstate/nuxt": "^1.2.0",
     "@prisma/client": "^5.8.0",
     "@stripe/stripe-js": "^2.2.2",
+    "@vueuse/core": "^10.7.2",
     "nuxt-lodash": "^2.5.3",
     "stripe": "^14.11.0"
   },

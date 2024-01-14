@@ -7,6 +7,7 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@pinia-plugin-persistedstate/nuxt',
     '@nuxtjs/color-mode',
+    'nuxt-lodash',
     '@nuxtjs/supabase',
   ],
 
@@ -21,6 +22,12 @@ export default defineNuxtConfig({
     inlineSSRStyles: false,
     renderJsonPayloads: true,
     typedPages: true,
+  },
+
+  runtimeConfig: {
+    public: {
+      stripePK: process.env.STRIPE_PK_KEY,
+    },
   },
 
   css: [
