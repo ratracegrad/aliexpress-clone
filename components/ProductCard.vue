@@ -1,32 +1,14 @@
 <script setup lang="ts">
-interface Product {
-  id: number
-  name: string
-  price: number
-  description: string
-  url: string
-}
-
-const props = defineProps({
-  product: {
-    type: Object as PropType<Product>,
-    required: true,
-  },
-})
+const props = defineProps(['product'])
 const { product } = toRefs(props)
 
 const priceComputed = computed(() => {
-  return product.value.price.toLocaleString('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  })
+    return product?.value.price / 100
 })
 
 const oldPriceComputed = computed(() => {
-  return (product.value.price * 1.2).toLocaleString('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  })
+    const res =  (product?.value.price + (product?.value.price / 20))  / 100
+    return res.toFixed(2)
 })
 </script>
 
