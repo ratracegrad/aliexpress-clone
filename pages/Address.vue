@@ -111,11 +111,11 @@ async function submit() {
       </div>
 
       <form @submit.prevent="submit()">
-        <TextInput v-model:input="contactName" class="w-full" placeholder="Contact Name" input-type="text" :error="error && error.type === 'contactName' ? error.message : ''" />
-        <TextInput v-model:input="address" class="w-full" placeholder="Address" input-type="text" :error="error && error.type === 'address' ? error.message : ''" />
-        <TextInput v-model:input="zipCode" class="w-full" placeholder="Zip Code" input-type="text" :error="error && error.type === 'zipCode' ? error.message : ''" />
-        <TextInput v-model:input="city" class="w-full" placeholder="City" input-type="text" :error="error && error.type === 'city' ? error.message : ''" />
-        <TextInput v-model:input="country" class="w-full" placeholder="Country" input-type="text" :error="error && error.type === 'country' ? error.message : ''" />
+        <TextInput v-model:input="contactName" class="w-full" placeholder="Contact Name" input-type="text" :error="error && error.type == 'contactName' ? error.message : ''" />
+        <TextInput v-model:input="address" class="w-full" placeholder="Address" input-type="text" :error="error && error.type == 'address' ? error.message : ''" />
+        <TextInput v-model:input="zipCode" class="w-full" placeholder="Zip Code" input-type="text" :error="error && error.type == 'zipCode' ? error.message : ''" />
+        <TextInput v-model:input="city" class="w-full" placeholder="City" input-type="text" :error="error && error.type == 'city' ? error.message : ''" />
+        <TextInput v-model:input="country" class="w-full" placeholder="Country" input-type="text" :error="error && error.type == 'country' ? error.message : ''" />
 
         <button
           :disabled="isWorking"
