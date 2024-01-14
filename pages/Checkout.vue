@@ -9,6 +9,7 @@ interface Product {
   description: string
 }
 
+const user = useSupabaseUser()
 const route = useRoute()
 const userStore = useUserStore()
 const stripe = null
@@ -19,29 +20,30 @@ const total = ref(0)
 const clientSecret = null
 const currentAddress = ref(null)
 const isProcessing = ref(false)
-const products = [
-  {
-    id: 4,
-    name: 'Product 4',
-    price: 4796,
-    url: 'https://picsum.photos/id/11/800/800',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla vel urna eget massa mollis aliquam. Donec euismod, nisl eget aliquet ultricies, nunc nisl aliquet nunc, quis ali',
-  },
-  {
-    id: 5,
-    name: 'Product 5',
-    price: 5995,
-    url: 'https://picsum.photos/id/12/800/800',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla vel urna eget massa mollis aliquam. Donec euismod, nisl eget aliquet ultricies, nunc nisl aliquet nunc, quis ali',
-  },
-]
 
 watch(() => total.value, () => {
   if (total.value > 0)
     stripeInit()
 })
 
-async function stripeInit() {}
+
+watchEffect(() => {
+  if (route.fullPath === '/checkout' && !user.value)
+    return navigateTo('/auth')
+})
+
+onBeforeMount(async () => {
+  if (userStore.checkout.length < 1)
+    return navigateTo('/shoppingcart')
+
+  total.value = 0.00
+
+  if (user.value) {
+    currentAddress.value = await useFetch(`/api/prisma/get-address-by-user/${user.value.id}`)
+    setTimeout(() => userStore.isLoading = false, 2000)
+  }
+})
+
 onMounted(() => {
   isProcessing.value = true
 
@@ -49,6 +51,8 @@ onMounted(() => {
     total.value += product.price
   })
 })
+
+async function stripeInit() {}
 
 async function pay() {}
 
@@ -65,7 +69,7 @@ async function showError() {}
           <div class="mb-2 text-xl font-semibold">
             Shipping Address
           </div>
-          <div v-if="true">
+          <div v-if="currentAddress && currentAddress.data">
             <NuxtLink to="/address" class="flex items-center pb-2 text-blue-500 hover:text-red-400">
               <div class="i-material-symbols-add text-lg" />
               <span class="ml-2">Update Address</span>
@@ -80,31 +84,31 @@ async function showError() {}
                 <li class="flex items-center gap-2">
                   <div>Contact name:</div>
                   <div class="font-bold">
-                    TEST
+                    {{ currentAddress.data.name }}
                   </div>
                 </li>
                 <li class="flex items-center gap-2">
                   <div>Address:</div>
                   <div class="font-bold">
-                    TEST
+                    {{ currentAddress.data.address }}
                   </div>
                 </li>
                 <li class="flex items-center gap-2">
                   <div>Zip Code:</div>
                   <div class="font-bold">
-                    TEST
+                    {{ currentAddress.data.zipcode }}
                   </div>
                 </li>
                 <li class="flex items-center gap-2">
                   <div>City:</div>
                   <div class="font-bold">
-                    TEST
+                    {{ currentAddress.data.city }}
                   </div>
                 </li>
                 <li class="flex items-center gap-2">
                   <div>Country:</div>
                   <div class="font-bold">
-                    TEST
+                    {{ currentAddress.data.country }}
                   </div>
                 </li>
               </ul>
@@ -118,7 +122,7 @@ async function showError() {}
         </div>
 
         <div id="Items" class="mt-4 rounded-lg bg-white p-4">
-          <div v-for="product in products" :key="product.id">
+          <div v-for="product in userStore.checkout" :key="product.id">
             <CheckoutItem :product="product" />
           </div>
         </div>
