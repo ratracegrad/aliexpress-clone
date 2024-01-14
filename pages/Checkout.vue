@@ -12,12 +12,12 @@ interface Product {
 const user = useSupabaseUser()
 const route = useRoute()
 const userStore = useUserStore()
-const stripe = null
-const elements = null
-const card = null
+let stripe: any = null
+let elements = null
+let card: any = null
 const form = null
 const total = ref(0)
-const clientSecret = null
+let clientSecret: any = null
 const currentAddress = ref(null)
 const isProcessing = ref(false)
 
@@ -52,13 +52,89 @@ onMounted(() => {
   })
 })
 
-async function stripeInit() {}
+async function stripeInit() {
+  const runtimeConfig = useRuntimeConfig()
+  stripe = Stripe(runtimeConfig.stripePK)
 
-async function pay() {}
+  const res = await $fetch('/api/stripe/paymentintent', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ amount: total.value })
+  })
 
-async function createOrder() {}
+  clientSecret = res.client_secret
 
-async function showError() {}
+  elements = stripe.elements()
+  const style = {
+    base: {
+      fontSize: '18px',
+    },
+    invalid: {
+      fontFamily: 'Arial, sans-serif',
+      color: '#EE4B2B',
+      iconColor: '#EE4B2B'
+    }
+  }
+  card = elements.create('card', { 
+    hidePostalCode: true,
+    style 
+  })
+
+  card.mount("#card-element")
+  card.on('change', (event: any) => {
+    document.querySelector('button')!.disabled = event.empty;
+    document.querySelector('#card-error')!.textContent = event.error ? event.error.message : '';
+  })
+
+  isProcessing.value = false
+}
+
+async function pay() {
+  if (currentAddress.value && currentAddress.value.data === '') {
+    showError('Please add a shipping address!')
+    return
+  }
+
+  isProcessing.value = true
+
+  const result = await stripe.confirmCardPayment(clientSecret, {
+    payment_method: { card }
+  })
+
+  if (result.error) {
+    showError(result.error.message);
+    isProcessing.value = false
+  } else {
+    await createOrder(result.paymentIntent.id)
+    userStore.cart = []
+    userStore.checkout = []
+    setTimeout(() => {
+      return navigateTo('/success')
+    }, 500)
+  }
+}
+
+async function createOrder(stripeId) {
+  await useFetch('/api/prisma/create-order', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      userId: user.value!.id,
+      stripeId,
+      name: currentAddress.value!.data.name,
+      address: currentAddress.value!.data.address,
+      zipcode: currentAddress.value!.data.zipcode,
+      city: currentAddress.value!.data.city,
+      country: currentAddress.value!.data.country,
+      products: userStore.checkout,
+    })
+  })
+}
+
+async function showError(errorMsgText: string): Promise<void> {
+  const errorMsg = document.querySelector('#card-error')!
+  errorMsg.textContent = errorMsgText
+}
 </script>
 
 <template>
